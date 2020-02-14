@@ -1,8 +1,9 @@
 <?php
 
-namespace Commands;
+namespace LaPress\BlogFront\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 
 /**
  * @author    Sebastian Szczepański
