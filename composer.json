@@ -1,0 +1,29 @@
+{
+    "name": "lapress/blogfront",
+    "description": "Starting package for blogfront api setup",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Szczepanski",
+            "email": "sebastian@ably.pl"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LaPress\\BlogFront\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaPress\\BlogFront\\PackageServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "illuminate/support": "^6.0",
+        "illuminate/console": "^6.0",
+        "illuminate/filesystem": "^6.0"
+    }
+}
