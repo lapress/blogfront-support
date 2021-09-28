@@ -2,27 +2,24 @@
 
 namespace LaPress\BlogFront\Commands;
 
+
 use LaPress\BlogFront\Installer;
 
-/**
- * @author    Sebastian Szczepański
- * @copyright ably
- */
-class ConfigureCommand extends BaseCommand
+class LinkContentCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'blogfront:configure';
+    protected $signature = 'blogfront:content:link';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Configure WordPress';
+    protected $description = 'Link content directory';
     /**
      * @var Installer
      */
@@ -30,7 +27,6 @@ class ConfigureCommand extends BaseCommand
 
     /**
      * Create a new command instance.
-     *
      * @param Installer $installer
      */
     public function __construct(Installer $installer)
@@ -38,13 +34,18 @@ class ConfigureCommand extends BaseCommand
         parent::__construct();
         $this->installer = $installer;
     }
-
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
     public function handle()
     {
-        $this->installer->wpConfig();
-        $this->icon('✔', 'Blogfront WordPress has been configured', 'wp-config.php');
+        try {
+            $this->installer->link();
+            $this->icon('✔', 'Public content has been linked');
+        } catch (\Exception $e) {
 
-        $this->installer->link();
-        $this->icon('✔', 'Content folder linked', '/content');
+        }
     }
 }

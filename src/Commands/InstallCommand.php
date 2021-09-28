@@ -2,21 +2,21 @@
 
 namespace LaPress\BlogFront\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use LaPress\BlogFront\Installer;
 
 /**
  * @author    Sebastian Szczepański
  * @copyright ably
  */
-class InstallCommand extends Command
+class InstallCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'lapress:install';
+    protected $signature = 'blogfront:setup';
 
     /**
      * The console command description.
@@ -28,16 +28,19 @@ class InstallCommand extends Command
      * @var Filesystem
      */
     private $filesystem;
+    /**
+     * @var Installer
+     */
+    private $installer;
 
     /**
      * Create a new command instance.
-     *
-     * @param Filesystem $filesystem
+     * @param Installer $installer
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Installer $installer)
     {
-        $this->filesystem = $filesystem;
         parent::__construct();
+        $this->installer = $installer;
     }
 
     /**
@@ -55,58 +58,20 @@ class InstallCommand extends Command
         $this->info(' |_|\__,_|_|   |_|  \___||___/___/ ');
         $this->info('                                   ');
 
+        $this->installer->deletePreviousWordPress();
+        $this->icon('✔', 'Previous WordPress code deleted');
+        $this->installer->wordpress();
+        $this->icon('✔', 'WordPress content moved to storage directory');
+        $this->installer->link();
+        $this->icon('✔', 'Public content linked');
+        $this->installer->wpConfig();
+        $this->icon('✔', 'Blogfront WordPress has been configured', 'wp-config.php');
 
-        $path = base_path('wordpress');
-        if ($this->filesystem->exists($path)) {
-            $this->filesystem->deleteDirectory($path);
-        }
-
-        \Artisan::call('preset', ['type' => 'lapress']);
-
-        $wordpress = config('wordpress.core');
-        if (!$this->filesystem->exists($wordpress)) {
-            exec('composer update johnpbloch/wordpress-core');
-        }
-        // make themes directory
-        $this->filesystem->makeDirectory(
-            storage_path('content/themes')
-        );
-        // make uploads directory
-        $this->filesystem->makeDirectory(
-            storage_path('content/uploads')
-        );
-        // copy plugins directory with its content
-        $this->filesystem->copy(
-            wordpress_path('wp-content/plugins'),
-            storage_path('content/plugins')
-        );
-        // copy languages directory with its content
-        $this->filesystem->copy(
-            wordpress_path('wp-content/languages'),
-            storage_path('content/languages')
-        );
-
-        $this->filesystem->cleanDirectory(
-            wordpress_path('wp-content')
-        );
-
-        exec('npm install');
-
-
-        \Artisan::call('lapress:install:wp-config');
-        \Artisan::call('lapress:content:link');
 
         $this->line('');
         $this->info('----------------------------');
         $this->info('|    laPress installed.    |');
         $this->info('----------------------------');
         $this->line('');
-        $this->line('Creating new theme');
-
-        $theme = $this->ask('Type theme name', basename(base_path()));
-
-        \Artisan::call('lapress:make:theme', ['name' => $theme]);
-        $this->line('Theme "'.$theme.'" generated.');
-        $this->line('Add "APP_THEME='.$theme.'" to your .env file to use it');
     }
 }
